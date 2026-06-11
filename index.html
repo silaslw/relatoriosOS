@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Relatórios de OS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- <header>
+  <div class="logo">Relatórios OS <span>/ Gerador</span></div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-gerador')">Gerador de OS</button>
+    <button class="tab-btn" onclick="switchTab('tab-config')">Base de Dados</button>
+  </div>
+</header> -->
+<header>
+  <div class="logo">Relatórios OS <span>/ Gerador</span></div>
+</header>
+
+<nav class="nav-bar">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-gerador')">Gerador de OS</button>
+    <button class="tab-btn" onclick="switchTab('tab-config')">Base de Dados</button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <div id="tab-gerador" class="tab-content active">
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header"><span class="card-title">Cabeçalho do relatório</span></div>
+      <div class="card-body">
+        <div class="row2">
+          <div class="field">
+            <label class="lbl">Data de referência</label>
+            <input type="text" id="data-ref" placeholder="ex: 26.05" maxlength="10">
+          </div>
+          <div class="field">
+            <label class="lbl">Mês / Período (opcional)</label>
+            <input type="text" id="mes-ref" placeholder="ex: MAIO/2026">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tecnicos-container">
+      <div class="empty">Clique em "Adicionar técnico" para começar.</div>
+    </div>
+
+    <div style="margin-top: 20px; margin-bottom: 80px;">
+      <button class="btn primary" onclick="addTecnico()">Adicionar técnico</button>
+    </div>
+  </div>
+
+  <div id="tab-config" class="tab-content">
+    <div class="card" style="margin-bottom:20px; border-color: var(--accent);">
+      <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong style="color: var(--accent);">Importação de Dados</strong>
+          <div style="font-size: 12px;">Importe técnicos, tipos de serviço, equipamentos e erros via planilha (.xlsx/.csv).</div>
+        </div>
+        <button class="btn" onclick="abrirImportacaoXLSX()">Importar Planilha</button>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="card"><div class="card-header">Colaboradores</div><div class="card-body"><input type="text" id="input-tecnicos" placeholder="Nome"><button class="btn" onclick="adicionarItemConfig('tecnicos')">Add</button><div id="list-tecnicos" class="config-list-container"></div></div></div>
+      <div class="card"><div class="card-header">Diagnósticos</div><div class="card-body"><input type="text" id="input-tipos_os" placeholder="Tipo"><button class="btn" onclick="adicionarItemConfig('tipos_os')">Add</button><div id="list-tipos_os" class="config-list-container"></div></div></div>
+      <div class="card"><div class="card-header">Equipamentos</div><div class="card-body"><input type="text" id="input-equipamentos" placeholder="Modelo"><button class="btn" onclick="adicionarItemConfig('equipamentos')">Add</button><div id="list-equipamentos" class="config-list-container"></div></div></div>
+      <div class="card"><div class="card-header">Motivos de Erro</div><div class="card-body"><input type="text" id="input-erros" placeholder="Descrição"><button class="btn" onclick="adicionarItemConfig('erros')">Add</button><div id="list-erros" class="config-list-container"></div></div></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="docx.bundle.js"></script>
+<script src="dados.js"></script>
+<script src="config.js"></script>
+<script src="estado.js"></script>
+<script src="helpers.js"></script>
+<script src="tecnicos.js"></script>
+<script src="ordens.js"></script>
+<script src="verificacao.js"></script>
+<script src="equipamentos.js"></script>
+<script src="erros.js"></script>
+<script src="ui.js"></script>
+<script src="leitura.js"></script>
+<script src="docx.js"></script>
+<div id="toast"></div>
+
+</body>
+</html>
