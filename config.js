@@ -11,19 +11,28 @@ const MAPA_DADOS = {
 
 // Alterna entre a aba do Gerador e a aba da Base de Dados
 function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  // 1. Limpa as classes ativas de tudo
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  
+  // 2. Ativa a aba atual
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
 
-    document.getElementById(tabId).classList.add('active');
-    document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+  // 3. Controle inteligente da Action Bar
+  const actionBar = document.getElementById('main-action-bar');
+  if (actionBar) {
+    // Só exibe a barra de gerar documentos se estiver no Gerador
+    actionBar.style.display = (tabId === 'tab-gerador') ? 'flex' : 'none';
+  }
 
-    if (tabId === 'tab-config') {
-        renderTodasListasConfig();
-    } else {
-        // Ao voltar para o gerador, atualiza as opções existentes em tela
-        refreshAllDropdowns();
-    }
-}
+  // 4. Ações específicas de cada aba
+  if (tabId === 'tab-config') {
+    renderTodasListasConfig();
+  } else {
+    refreshAllDropdowns();
+  }
+}  
 
 function renderTodasListasConfig() {
     Object.keys(MAPA_DADOS).forEach(tipo => renderListaConfig(tipo));
@@ -80,16 +89,14 @@ function refreshAllDropdowns() {
 }
 
 function atualizarSelectDOM(selectElement, arrayDados, placeholder) {
-    const valorSelecionado = selectElement.value; // Guarda o valor atual
-    selectElement.innerHTML = `
+  const valorSelecionado = selectElement.value;
+  selectElement.innerHTML = `
     <option value="">${placeholder}</option>
     ${arrayDados.map(o => `<option value="${o}">${o}</option>`).join('')}
-    <option value="__manual__">Outro (manual)</option>
-    `;
-    // Restaura o valor se ele ainda existir na lista, senão reseta
-    if (arrayDados.includes(valorSelecionado) || valorSelecionado === '__manual__') {
-        selectElement.value = valorSelecionado;
-    }
+  `;
+  if (arrayDados.includes(valorSelecionado)) {
+    selectElement.value = valorSelecionado;
+  }
 }
 
 // ==========================================================================
@@ -185,3 +192,5 @@ function processarPlanilha(dadosPlanilha) {
         toast('Planilha lida. Nenhum item novo encontrado (já existiam).', 4000);
     }
 }
+// Dispara a aba do gerador no primeiro carregamento da página
+switchTab('tab-gerador');

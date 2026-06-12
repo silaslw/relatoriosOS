@@ -18,7 +18,6 @@ function addOS(tid) {
     </div>
     <div class="os-body">
 
-      <!-- LINHA 1: número + tipo -->
       <div class="row2">
         <div class="field">
           <label class="lbl">Número da OS</label>
@@ -29,18 +28,10 @@ function addOS(tid) {
           <select id="os-tipo-${oid}">
             <option value="">Selecione</option>
             ${selectOpts(TIPOS_OS, '')}
-            <option value="__manual__">Outro (manual)</option>
           </select>
         </div>
       </div>
 
-      <!-- TIPO MANUAL -->
-      <div class="field hidden" id="os-tipo-manual-wrap-${oid}">
-        <label class="lbl">Diagnóstico manual</label>
-        <input type="text" id="os-tipo-manual-${oid}" placeholder="DESCREVA O DIAGNÓSTICO">
-      </div>
-
-      <!-- EQUIPAMENTOS -->
       <div class="sec-label">Equipamentos instalados / envolvidos</div>
       <div id="equip-list-${oid}"></div>
       <div class="add-row">
@@ -50,13 +41,11 @@ function addOS(tid) {
         </button>
       </div>
 
-      <!-- INFORMAÇÕES ADICIONAIS -->
       <div class="sec-label">Informações adicionais</div>
       <div class="field">
         <textarea id="os-obs-${oid}" placeholder="Observações, diagnóstico detalhado, situação do cliente..." rows="2"></textarea>
       </div>
 
-      <!-- MARCAR PARA VERIFICAÇÃO -->
       <div class="divider"></div>
       <div class="verif-mark">
         <input type="checkbox" id="verif-chk-${oid}" onchange="toggleVerif('${oid}')">
@@ -75,7 +64,6 @@ function addOS(tid) {
           </button>
         </div>
       </div>
-
     </div>`;
   container.appendChild(div);
   // refresh badge on parent tec block

@@ -62,17 +62,12 @@ function addTecnico() {
     </div>
     <div class="tec-body">
       <div class="row2" style="margin-bottom:12px">
-        <div class="field">
+        <div class="field" style="grid-column: span 2;">
           <label class="lbl">Técnico</label>
-          <select id="tec-sel-${tid}" onchange="onTecnicoChange('${tid}')">
+          <select id="tec-sel-${tid}" onchange="updateTecLabel('${tid}'); refreshTecnicosOptions('${tid}')">
             <option value="">Selecione o técnico</option>
             ${TECNICOS.map(n => `<option value="${n}">${n}</option>`).join('')}
-            <option value="__outro__">Outro (digitar manualmente)</option>
           </select>
-        </div>
-        <div class="field hidden" id="tec-manual-wrap-${tid}">
-          <label class="lbl">Nome manual</label>
-          <input type="text" id="tec-manual-${tid}" placeholder="NOME COMPLETO" oninput="updateTecLabel('${tid}')">
         </div>
       </div>
       <div id="os-list-${tid}"></div>
@@ -131,26 +126,8 @@ function finalizarTecnico(tid) {
   }
 }
 
-function onTecnicoChange(tid) {
-  const s = sel('tec-sel-' + tid);
-  const wrap = sel('tec-manual-wrap-' + tid);
-  if (s.value === '__outro__') {
-    wrap.classList.remove('hidden');
-  } else {
-    wrap.classList.add('hidden');
-  }
-  updateTecLabel(tid);
-  refreshTecnicosOptions(tid);
-}
-
 function updateTecLabel(tid) {
   const s = sel('tec-sel-' + tid);
   const lbl = sel('tec-label-' + tid);
-  let nome = '';
-  if (s.value === '__outro__') {
-    nome = raw('tec-manual-' + tid).toUpperCase() || 'Técnico manual';
-  } else {
-    nome = s.value || 'Novo técnico';
-  }
-  lbl.textContent = nome;
+  lbl.textContent = s.value || 'Novo técnico';
 }
