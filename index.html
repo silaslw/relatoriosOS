@@ -1,98 +1,232 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerador de Relatórios de OS</title>
-  <link rel="stylesheet" href="style.css">
-  
-  <script src="theme.js"></script>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Relatórios de OS</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Theme aplicado antes do render para evitar FOUC -->
+    <script src="theme.js"></script>
+  </head>
+  <body>
 
-<header style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--bg-card); border-bottom: 1px solid var(--border-color);">
-  <div class="logo">Relatórios OS <span>/ Gerador</span></div>
-  
-  <button id="btn-theme" class="btn-icon" onclick="toggleTheme()" title="Alternar tema">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-    </svg>
-  </button>
-</header>
+  <header>
+    <div class="logo">Relatórios OS <span>/ Gerador</span></div>
+    <button id="btn-theme" class="btn-icon" onclick="toggleTheme()" title="Alternar tema">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </header>
 
-<nav class="nav-bar">
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('tab-gerador')">Gerador de OS</button>
-    <button class="tab-btn" onclick="switchTab('tab-config')">Base de Dados</button>
-  </div>
-</nav>
+  <nav class="nav-bar">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-gerador')">Gerador de OS</button>
+      <button class="tab-btn" onclick="switchTab('tab-config')">Base de Dados</button>
+      <button class="tab-btn" onclick="switchTab('tab-analytics')">Métricas</button>
+    </div>
+  </nav>
 
-<div class="main">
-  <div id="tab-gerador" class="tab-content active">
-    
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header"><span class="card-title">Cabeçalho do relatório</span></div>
-      <div class="card-body">
-        <div class="field" style="width: 100%;">
-          <label class="lbl">Data de referência</label>
-          <input type="text" id="data-ref" placeholder="ex: 26.05" maxlength="10" style="width: 100%;">
+  <div class="main">
+    <!-- ===== ABA: GERADOR ===== -->
+    <div id="tab-gerador" class="tab-content active">
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><span class="card-title">Cabeçalho do relatório</span></div>
+        <div class="card-body">
+          <div class="field">
+            <label class="lbl">Data de referência</label>
+            <input type="text" id="data-ref" placeholder="ex: 26.05" maxlength="10">
+          </div>
+        </div>
+      </div>
+      <div id="tecnicos-container">
+        <div class="empty">Clique em "Adicionar técnico" para começar.</div>
+      </div>
+      <div style="margin-top:20px">
+        <button class="btn primary" onclick="addTecnico()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Adicionar técnico
+        </button>
+      </div>
+    </div>
+    <!-- ===== ABA: BASE DE DADOS ===== -->
+    <div id="tab-config" class="tab-content">
+      <div class="card" style="margin-bottom:20px; border-color: var(--accent);">
+        <div class="card-body" style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+          <div>
+            <strong>Importação em massa</strong>
+            <div style="font-size:12px; color:var(--text2); margin-top:2px;">
+              Importe via planilha (.xlsx / .csv) com colunas: TECNICO, DIAGNOSTICO, EQUIPAMENTO, ERRO.
+            </div>
+          </div>
+          <button class="btn" onclick="abrirImportacaoXLSX()" style="white-space:nowrap">Importar planilha</button>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Colaboradores</span></div>
+          <div class="card-body">
+            <div class="field" style="flex-direction:row; gap:8px;">
+              <input type="text" id="input-tecnicos" placeholder="Nome" style="flex:1">
+              <button class="btn primary" onclick="adicionarItemConfig('tecnicos')">Add</button>
+            </div>
+            <div id="list-tecnicos" class="config-list-container"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Diagnósticos</span></div>
+          <div class="card-body">
+            <div class="field" style="flex-direction:row; gap:8px;">
+              <input type="text" id="input-tipos_os" placeholder="Tipo" style="flex:1">
+              <button class="btn primary" onclick="adicionarItemConfig('tipos_os')">Add</button>
+            </div>
+            <div id="list-tipos_os" class="config-list-container"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Equipamentos</span></div>
+          <div class="card-body">
+            <div class="field" style="flex-direction:row; gap:8px;">
+              <input type="text" id="input-equipamentos" placeholder="Modelo" style="flex:1">
+              <button class="btn primary" onclick="adicionarItemConfig('equipamentos')">Add</button>
+            </div>
+            <div id="list-equipamentos" class="config-list-container"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Motivos de Erro</span></div>
+          <div class="card-body">
+            <div class="field" style="flex-direction:row; gap:8px;">
+              <input type="text" id="input-erros" placeholder="Descrição" style="flex:1">
+              <button class="btn primary" onclick="adicionarItemConfig('erros')">Add</button>
+            </div>
+            <div id="list-erros" class="config-list-container"></div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div id="tecnicos-container">
-      <div class="empty">Clique em "Adicionar técnico" para começar.</div>
-    </div>
-
-    <div style="margin-top: 20px; margin-bottom: 80px;">
-      <button class="btn primary" onclick="addTecnico()">Adicionar técnico</button>
-    </div>
-  </div>
-
-  <div id="tab-config" class="tab-content">
-    <div class="card" style="margin-bottom:20px; border-color: var(--accent);">
-      <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <strong style="color: var(--accent);">Importação de Dados</strong>
-          <div style="font-size: 12px; color: var(--text2);">Importe técnicos, tipos de serviço, equipamentos e erros via planilha (.xlsx/.csv).</div>
+    <!-- ===== ABA: MÉTRICAS ===== -->
+    <div id="tab-analytics" class="tab-content">
+      <!-- Resumo -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value" id="m-total-os">—</div>
+          <div class="metric-label">OS Registradas</div>
         </div>
-        <button class="btn" onclick="abrirImportacaoXLSX()">Importar Planilha</button>
+        <div class="metric-card">
+          <div class="metric-value" id="m-total-tec">—</div>
+          <div class="metric-label">Técnicos Únicos</div>
+        </div>
+        <div class="metric-card warn">
+          <div class="metric-value" id="m-total-verif">—</div>
+          <div class="metric-label">Verificações</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="m-pct-verif">—</div>
+          <div class="metric-label">Taxa de Verificação</div>
+        </div>
+      </div>
+      <!-- Gráficos lado a lado -->
+      <div class="row2" style="margin-bottom:12px">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-header"><span class="card-title">OS por Técnico</span></div>
+          <div class="card-body" id="chart-tecnicos">
+            <div class="empty">Gere relatórios para ver dados aqui.</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-header"><span class="card-title">Pendências mais frequentes</span></div>
+          <div class="card-body" id="chart-erros">
+            <div class="empty">Nenhuma verificação registrada.</div>
+          </div>
+        </div>
+      </div>
+      <!-- Equipamentos -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Equipamentos mais instalados</span></div>
+        <div class="card-body" id="chart-equips">
+          <div class="empty">Nenhum equipamento registrado.</div>
+        </div>
+      </div>
+      <!-- Histórico detalhado -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Histórico de gerações</span>
+          <span id="m-total-geracoes" style="font-size:11px; color:var(--text3)"></span>
+        </div>
+        <div class="card-body" style="padding:0; overflow:auto" id="historico-table">
+          <div class="empty" style="margin:16px">Nenhum relatório gerado ainda.</div>
+        </div>
+      </div>
+      <!-- Exportar -->
+      <div class="card" style="margin-bottom:100px">
+        <div class="card-header"><span class="card-title">Exportar dados brutos</span></div>
+        <div class="card-body">
+          <div class="export-row">
+            <div class="export-row-btns">
+              <button class="btn" onclick="exportarXLSX()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                .xlsx
+              </button>
+              <button class="btn" onclick="exportarCSV()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                .csv
+              </button>
+              <button class="btn" onclick="exportarXML()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                .xml
+              </button>
+            </div>
+            <button class="btn danger sm" onclick="confirmarLimparHistorico()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+              </svg>
+              Limpar histórico
+            </button>
+          </div>
+          <div style="margin-top:8px; font-size:11px; color:var(--text3)">
+            Cada vez que você gera relatórios, os dados são gravados automaticamente no histórico local.
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="row2">
-      <div class="card"><div class="card-header"><span class="card-title">Colaboradores</span></div><div class="card-body"><div class="field" style="flex-direction:row; gap:8px;"><input type="text" id="input-tecnicos" placeholder="Nome" style="flex:1"><button class="btn primary" onclick="adicionarItemConfig('tecnicos')">Add</button></div><div id="list-tecnicos" class="config-list-container"></div></div></div>
-      <div class="card"><div class="card-header"><span class="card-title">Diagnósticos</span></div><div class="card-body"><div class="field" style="flex-direction:row; gap:8px;"><input type="text" id="input-tipos_os" placeholder="Tipo" style="flex:1"><button class="btn primary" onclick="adicionarItemConfig('tipos_os')">Add</button></div><div id="list-tipos_os" class="config-list-container"></div></div></div>
-      <div class="card"><div class="card-header"><span class="card-title">Equipamentos</span></div><div class="card-body"><div class="field" style="flex-direction:row; gap:8px;"><input type="text" id="input-equipamentos" placeholder="Modelo" style="flex:1"><button class="btn primary" onclick="adicionarItemConfig('equipamentos')">Add</button></div><div id="list-equipamentos" class="config-list-container"></div></div></div>
-      <div class="card"><div class="card-header"><span class="card-title">Motivos de Erro</span></div><div class="card-body"><div class="field" style="flex-direction:row; gap:8px;"><input type="text" id="input-erros" placeholder="Descrição" style="flex:1"><button class="btn primary" onclick="adicionarItemConfig('erros')">Add</button></div><div id="list-erros" class="config-list-container"></div></div></div>
-    </div>
   </div>
-</div>
-
-<div class="action-bar" id="main-action-bar">
-  <div class="info" id="action-info">Preencha os dados e gere os documentos</div>
-  <button class="btn primary" onclick="gerarDocumentos()" id="btn-gerar">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-    Gerar relatórios
-  </button>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="theme.js"></script>
-<script src="docx.bundle.js"></script>
-<script src="dados.js"></script>
-<script src="config.js"></script>
-<script src="estado.js"></script>
-<script src="helpers.js"></script>
-<script src="tecnicos.js"></script>
-<script src="ordens.js"></script>
-<script src="verificacao.js"></script>
-<script src="equipamentos.js"></script>
-<script src="erros.js"></script>
-<script src="ui.js"></script>
-<script src="leitura.js"></script>
-<script src="docx.js"></script>
-<div id="toast"></div>
-
-</body>
+  <!-- Barra de ação fixa -->
+  <div class="action-bar" id="main-action-bar">
+    <div class="info" id="action-info">Preencha os dados e gere os documentos</div>
+    <button class="btn primary" onclick="gerarDocumentos()" id="btn-gerar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="12" y1="18" x2="12" y2="12"/>
+        <line x1="9" y1="15" x2="15" y2="15"/>
+      </svg>
+      Gerar relatórios
+    </button>
+  </div>
+  <div id="toast"></div>
+  <!-- Dependências externas -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="docx.bundle.js"></script>
+  <!-- App (ordem importa) -->
+  <script src="dados.js"></script>
+  <script src="core.js"></script>
+  <script src="blocos.js"></script>
+  <script src="config.js"></script>
+  <script src="analytics.js"></script>
+  <script src="docx.js"></script>
+  </body>
 </html>
