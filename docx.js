@@ -115,7 +115,7 @@ async function gerarDocEquipamentos(dados) {
   });
 
   const blob = await Packer.toBlob(doc);
-  download(blob, 'EQUIPAMENTOS_INSTALADOS_REF_' + dados.dataRef.replace('.','_') + '.docx');
+  download(blob, 'EQUIPAMENTOS INSTALADOS REF.' + dados.dataRef.replace('.','_') + '.docx');
 }
 
 // ======================== DOC 2: VERIFICAÇÃO DE OS ========================
@@ -123,7 +123,7 @@ async function gerarDocVerificacao(dados) {
   // Filtra apenas OS marcadas para verificação
   const children = [];
 
-  children.push(paraCenter([runBold('VERIFICACAO DE ORDENS DE SERVICOS', 32)]));
+  children.push(paraCenter([runBold('VERIFICAÇÃO DE ORDENS DE SERVICOS', 32)]));
   children.push(paraCenter([runNormal('REFERENTE AO DIA ' + dados.dataRef, 32)]));
   children.push(emptyLine());
 
@@ -178,7 +178,7 @@ async function gerarDocVerificacao(dados) {
   });
 
   const blob = await Packer.toBlob(doc);
-  download(blob, 'VERIFICACAO_OS_REF_' + dados.dataRef.replace('.','_') + '.docx');
+  download(blob, 'VERIFICAÇÃO ORDENS DE SERVIÇO REF.' + dados.dataRef.replace('.','_') + '.docx');
 }
 
 // ======================== DOWNLOAD ========================
