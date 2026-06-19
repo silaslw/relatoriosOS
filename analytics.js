@@ -6,11 +6,11 @@
 
 function computarMetricas(historico) {
   const m = {
-    totalOS:          0,
+    totalOS:           0,
     totalVerificacoes: 0,
-    porTecnico:       {},   // { nome: { total, verificacoes } }
-    errosFreq:        {},   // { erro: count }
-    equipFreq:        {}    // { modelo: count }
+    porTecnico:        {},   // { nome: { total, verificacoes } }
+    errosFreq:         {},   // { erro: count }
+    equipFreq:         {}    // { modelo: count }
   };
 
   historico.forEach(geracao => {
@@ -98,7 +98,7 @@ function renderAnalytics() {
 // ---------- Helpers de renderização ----------
 
 function _setMetricCards(os, tec, verif, pct) {
-  const ids = ['m-total-os', 'm-total-tec', 'm-total-verif', 'm-pct-verif'];
+  const ids  = ['m-total-os', 'm-total-tec', 'm-total-verif', 'm-pct-verif'];
   const vals = [os, tec, verif, pct];
   ids.forEach((id, i) => { const el = sel(id); if (el) el.textContent = vals[i]; });
 }
@@ -131,6 +131,8 @@ function _renderBarChart(containerId, data, mapper, colorClass = 'accent', limit
   }
 
   const max = entries[0].value || 1;
+  // colorClass 'accent' usa a classe padrão sem modificador; warn e success adicionam a sua própria
+  const fillClass = colorClass === 'accent' ? '' : colorClass;
 
   el.innerHTML = entries.map(item => {
     const pct = Math.round(item.value / max * 100);
@@ -138,8 +140,7 @@ function _renderBarChart(containerId, data, mapper, colorClass = 'accent', limit
       <div class="chart-bar-row">
         <span class="chart-label" title="${item.label}">${item.label}</span>
         <div class="chart-bar-track">
-          <div class="chart-bar-fill ${colorClass === 'accent' ? '' : colorClass}"
-               style="width:${pct}%"></div>
+          <div class="chart-bar-fill ${fillClass}" style="width:${pct}%"></div>
         </div>
         <span class="chart-val">${item.display}</span>
         ${item.suffix}
@@ -189,20 +190,21 @@ function _renderHistoricoTable(historico) {
 
 // ======================== EXPORTAÇÃO ========================
 
-function exportarCSV() {
-  const historico = carregarHistorico();
-  if (!historico.length) return toast('Nenhum dado para exportar.', 3000);
-
-  const cabecalho = [
-    'Data Ref','Gerado Em','Técnico','Nº OS','Tipo',
-    'Para Verificação','Erros','Equipamentos','Observação'
+/**
+ * Constrói as linhas brutas do histórico — compartilhado por CSV e XLSX.
+ * Extrai a lógica duplicada que existia em exportarCSV() e exportarXLSX().
+ */
+function _buildExportRows(historico) {
+  const header = [
+    'Data Ref', 'Gerado Em', 'Técnico', 'Nº OS', 'Tipo',
+    'Para Verificação', 'Erros', 'Equipamentos', 'Observação'
   ];
-  const linhas = [cabecalho];
+  const rows = [header];
 
   historico.forEach(g => {
     g.tecnicos.forEach(tec => {
       tec.osList.forEach(os => {
-        linhas.push([
+        rows.push([
           g.dataRef,
           new Date(g.geradoEm).toLocaleString('pt-BR'),
           tec.nome,
@@ -217,6 +219,14 @@ function exportarCSV() {
     });
   });
 
+  return rows;
+}
+
+function exportarCSV() {
+  const historico = carregarHistorico();
+  if (!historico.length) return toast('Nenhum dado para exportar.', 3000);
+
+  const linhas = _buildExportRows(historico);
   const csv = '\ufeff' + linhas
     .map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))
     .join('\r\n');
@@ -262,30 +272,12 @@ function exportarXLSX() {
   const historico = carregarHistorico();
   if (!historico.length) return toast('Nenhum dado para exportar.', 3000);
 
-  // Aba 1 — Dados brutos completos
-  const raw1 = [['Data Ref','Gerado Em','Técnico','Nº OS','Tipo',
-                  'Para Verificação','Erros','Equipamentos','Observação']];
-  historico.forEach(g => {
-    g.tecnicos.forEach(tec => {
-      tec.osList.forEach(os => {
-        raw1.push([
-          g.dataRef,
-          new Date(g.geradoEm).toLocaleString('pt-BR'),
-          tec.nome,
-          os.numOS,
-          os.tipo || '',
-          os.paraVerif ? 'SIM' : 'NÃO',
-          (os.erros  || []).join('; '),
-          (os.equips || []).map(e => `${e.modelo}(${e.serial})`).join('; '),
-          os.obs || ''
-        ]);
-      });
-    });
-  });
+  // Aba 1 — usa helper compartilhado (antes era código duplicado de exportarCSV)
+  const raw1 = _buildExportRows(historico);
 
   // Aba 2 — OS por técnico
   const m    = computarMetricas(historico);
-  const raw2 = [['Técnico','Total OS','Verificações','Taxa (%)']];
+  const raw2 = [['Técnico', 'Total OS', 'Verificações', 'Taxa (%)']];
   Object.entries(m.porTecnico)
     .sort((a, b) => b[1].total - a[1].total)
     .forEach(([nome, d]) => {
@@ -294,13 +286,13 @@ function exportarXLSX() {
     });
 
   // Aba 3 — Erros mais frequentes
-  const raw3 = [['Erro / Pendência','Ocorrências']];
+  const raw3 = [['Erro / Pendência', 'Ocorrências']];
   Object.entries(m.errosFreq)
     .sort((a, b) => b[1] - a[1])
     .forEach(([e, n]) => raw3.push([e, n]));
 
   // Aba 4 — Equipamentos mais instalados
-  const raw4 = [['Equipamento','Instalações']];
+  const raw4 = [['Equipamento', 'Instalações']];
   Object.entries(m.equipFreq)
     .sort((a, b) => b[1] - a[1])
     .forEach(([e, n]) => raw4.push([e, n]));

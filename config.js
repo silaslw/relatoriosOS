@@ -174,5 +174,24 @@ function processarPlanilha(linhas) {
   );
 }
 
-// Inicializa na aba Gerador
+// ==========================================================================
+// INICIALIZAÇÃO — aba padrão + atalhos globais
+// ==========================================================================
+
 switchTab('tab-gerador');
+
+// Atalho de teclado: Ctrl/Cmd + Enter → gerar relatórios (apenas na aba Gerador)
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    const tab = document.querySelector('.tab-content.active');
+    if (tab && tab.id === 'tab-gerador') gerarDocumentos();
+  }
+});
+
+// Alerta ao fechar/recarregar a aba com OS preenchidas
+window.addEventListener('beforeunload', e => {
+  if (document.querySelectorAll('.os-block').length > 0) {
+    e.preventDefault();
+    e.returnValue = ''; // texto não customizável — o navegador exibe o próprio aviso
+  }
+});
