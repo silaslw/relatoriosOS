@@ -183,7 +183,12 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.main { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+.main { 
+  max-width: 900px; 
+  margin: 0 auto; 
+  /* 40px topo, 20px laterais, e 100px de fundo para nunca colidir com o footer */
+  padding: 40px 20px 100px 20px; 
+}
 
 /* ==========================================================================
    CARDS
@@ -440,27 +445,60 @@ select { cursor: pointer; }
    ========================================================================== */
 
 .sec-label {
-  font-size: 12px; font-weight: 700; color: var(--text);
-  margin: 16px 0 8px; display: flex; align-items: center; gap: 12px;
+  font-size: 12px; 
+  font-weight: 700; 
+  color: var(--text);
+  margin: 16px 0 8px; 
+  display: flex; 
+  align-items: center; 
+  gap: 12px;
 }
-.sec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.sec-label::after { 
+  content: ''; 
+  flex: 1; 
+  height: 1px; 
+  background: var(--border); 
+}
 
-.add-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.add-row { 
+  display: flex; 
+  gap: 10px; 
+  flex-wrap: wrap; 
+  margin-top: 8px; 
+}
 
 .badge {
-  font-size: 11px; font-weight: 600;
-  padding: 2px 8px; border-radius: var(--radius);
+  font-size: 11px; 
+  font-weight: 600;
+  padding: 2px 8px; 
+  border-radius: var(--radius);
   border: 1px solid var(--border);
-  display: inline-flex; align-items: center;
+  display: inline-flex; 
+  align-items: center;
 }
 
-.badge.warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); }
-.badge.num { background: var(--surface); color: var(--text); }
-.badge.ok { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+.badge.warn { 
+  background: var(--warn-bg); 
+  color: var(--warn); 
+  border-color: var(--warn); 
+}
+.badge.num { 
+  background: var(--surface); 
+  color: var(--text); 
+}
+.badge.ok { 
+  background: var(--success-bg); 
+  color: var(--success); 
+  border-color: var(--success); 
+}
 
 .tag {
-  font-size: 12px; padding: 4px 10px; border-radius: var(--radius);
-  font-weight: 500; background: var(--surface); color: var(--text2);
+  font-size: 12px; 
+  padding: 4px 10px; 
+  border-radius: var(--radius);
+  font-weight: 500; 
+  background: var(--surface); 
+  color: var(--text2);
   border: 1px solid var(--border);
 }
 
@@ -470,11 +508,17 @@ select { cursor: pointer; }
 
 /* Mantido o nome "glass-footer", mas com comportamento de bloco sólido */
 .glass-footer {
-  position: fixed; bottom: 0; left: 0; right: 0;
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  right: 0;
   background: var(--surface);
   border-top: 1px solid var(--border);
   padding: 14px 32px;
-  display: flex; gap: 16px; justify-content: flex-end; align-items: center;
+  display: flex; 
+  gap: 16px; 
+  justify-content: flex-end; 
+  align-items: center;
   z-index: 100;
 }
 .glass-footer .info { flex: 1; font-size: 13px; font-weight: 500; color: var(--text3); }
