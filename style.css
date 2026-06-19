@@ -381,6 +381,7 @@ select { cursor: pointer; }
 }
 
 .pill-btn { border-radius: 999px; }
+.btn-secundario { border-radius: 999px; }
 
 .btn:hover { background: var(--surface2); border-color: var(--border2); }
 
