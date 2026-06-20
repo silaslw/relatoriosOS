@@ -630,7 +630,7 @@ select { cursor: pointer; }
   .glass-header { padding: 0 16px; height: 56px; }
   .main { padding: 24px 12px; }
   .row2, .row3 { grid-template-columns: 1fr; gap: 12px; }
-  equip-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .equip-row { grid-template-columns: 1fr 1fr; gap: 8px; }
   .equip-row > *:last-child { grid-column: span 2; justify-self: start; }
   .metrics-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
   .metric-value { font-size: 28px; }
