@@ -33,6 +33,21 @@ function addTecnico() {
   const container = sel('tecnicos-container');
   if (!container) return;
 
+  // GATEKEEPING: Evita a criação de múltiplos blocos vazios
+  const lastBlock = container.querySelector('.tec-block:last-child');
+  if (lastBlock) {
+    const lastTid = lastBlock.id.replace('tec-', '');
+    const lastTecSelect = sel('tec-sel-' + lastTid);
+    
+    if (lastTecSelect && !lastTecSelect.value) {
+      toast('⚠️ Defina o nome do técnico atual antes de adicionar outro.', 3500);
+      lastTecSelect.focus();
+      lastTecSelect.style.outline = '2px solid #ef4444';
+      setTimeout(() => lastTecSelect.style.outline = '', 2500);
+      return; // Impede a criação
+    }
+  }
+
   const empty = container.querySelector('.empty');
   if (empty) empty.remove();
 
@@ -93,7 +108,12 @@ function addTecnico() {
   container.appendChild(div);
   updateActionInfo();
   refreshTecnicosOptions();
-  setTimeout(() => div.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  
+  // Foca no select do técnico assim que o bloco é criado
+  setTimeout(() => {
+    div.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    sel('tec-sel-' + tid).focus();
+  }, 50);
 }
 
 function removeTecnico(tid) {
@@ -132,6 +152,52 @@ function updateTecLabel(tid) {
 // ======================== ORDENS DE SERVIÇO ========================
 
 function addOS(tid) {
+  // 1. GATEKEEPING: Valida se o técnico possui um nome selecionado
+  const tecSelect = sel('tec-sel-' + tid);
+  if (tecSelect && !tecSelect.value) {
+    toast('⚠️ Selecione o nome do técnico antes de abrir uma OS.', 3500);
+    tecSelect.focus();
+    tecSelect.style.outline = '2px solid #ef4444'; // Feedback visual rápido (vermelho)
+    setTimeout(() => tecSelect.style.outline = '', 2500);
+    return; // Interrompe a execução
+  }
+
+  // 2. GATEKEEPING: Valida integridade das Ordens de Serviço anteriores deste técnico
+  const osListContainer = sel('os-list-' + tid);
+  if (osListContainer) {
+    const existingOS = osListContainer.querySelectorAll('.os-block');
+    let hasValidationError = false;
+
+    existingOS.forEach(osBlock => {
+      const oid = osBlock.id.replace('os-', '');
+      const numInput = sel('os-num-' + oid);
+      const tipoSelect = sel('os-tipo-' + oid);
+
+      const isNumEmpty = !numInput.value.trim();
+      const isTipoEmpty = !tipoSelect.value;
+
+      if (isNumEmpty || isTipoEmpty) {
+        hasValidationError = true;
+        
+        // Aplica o feedback visual nos campos vazios
+        if (isNumEmpty) {
+          numInput.style.outline = '2px solid #ef4444';
+          setTimeout(() => numInput.style.outline = '', 2500);
+        }
+        if (isTipoEmpty) {
+          tipoSelect.style.outline = '2px solid #ef4444';
+          setTimeout(() => tipoSelect.style.outline = '', 2500);
+        }
+      }
+    });
+
+    if (hasValidationError) {
+      toast('⚠️ Preencha o Número e o Diagnóstico das OS anteriores antes de adicionar uma nova.', 4000);
+      return; // Interrompe a execução
+    }
+  }
+
+  // 3. EXECUÇÃO: Se passou pelas validações, constrói a nova OS
   const oid       = nextId();
   const container = sel('os-list-' + tid);
   const div       = document.createElement('div');
@@ -217,6 +283,12 @@ function addOS(tid) {
   container.appendChild(div);
   _syncOSCount(tid);
   updateActionInfo();
+  
+  // Opcional: foca automaticamente no campo Número da OS recém-criada
+  setTimeout(() => {
+    const novoInput = sel('os-num-' + oid);
+    if(novoInput) novoInput.focus();
+  }, 50);
 }
 
 function removeOS(oid) {
