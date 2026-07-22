@@ -252,18 +252,15 @@ function _renderTecnicosPanel(containerId, dadosGeral, dadosMes, mesesDisponivei
     <div class="tecnicos-panel-container">
       <div class="tecnicos-panel-header">
         <div class="tecnicos-toggle-group">
-          <button class="tecnicos-toggle ${filtroAtual === 'geral' ? 'active' : ''}" 
-                  onclick="setFiltroTecnicos('geral')">
+          <button class="tecnicos-toggle ${filtroAtual === 'geral' ? 'active' : ''}" onclick="setFiltroTecnicos('geral')">
             TODO O PERÍODO
           </button>
-          <button class="tecnicos-toggle ${mesAtivo ? 'active' : ''} with-dropdown" 
-                  onclick="toggleMesDropdown()">
+          <button class="tecnicos-toggle ${mesAtivo ? 'active' : ''} with-dropdown" onclick="toggleMesDropdown()">
             ${mesLabel}
             <svg class="toggle-arrow ${mesAtivo ? 'open' : ''}" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="6 9 12 15 18 9"/>
             </svg>
-          </button>
-          ${dropdownHtml}
+          </button>${dropdownHtml}
         </div>
       </div>
       <div class="tecnicos-panel-content">

@@ -843,7 +843,7 @@ select { cursor: pointer; }
 
 .tecnicos-panel-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   padding: 16px 20px;
   background: var(--surface2);
@@ -865,7 +865,7 @@ select { cursor: pointer; }
 
 .tecnicos-toggle {
   display: flex;
-  align-items: center;
+  align-items: space-around;
   gap: 6px;
   padding: 8px 16px;
   border: 1px solid var(--border);
