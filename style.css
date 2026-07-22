@@ -1,0 +1,1095 @@
+/* ==========================================================================
+   SISTEMA DE TEMAS — ESTILO FLAT/MANUS
+   ========================================================================== */
+
+:root, :root[data-theme="light"] {
+  --bg: #eaeaea;
+  --surface: #FFFFFF;
+  --surface2: #F3F4F6;
+  --border: #E5E7EB;
+  --border2: #D1D5DB;
+  --text: #111827;
+  --text2: #374151;
+  --text3: #6B7280;
+  --accent: #000000;
+  --accent-fg: #FFFFFF;
+  --accent-light: #E5E7EB;
+  --block-header: #111827;
+  --block-header-fg: #F9FAFB;
+  --danger: #DC2626;
+  --danger-bg: #FEF2F2;
+  --warn: #D97706;
+  --warn-bg: #FFFBEB;
+  --success: #059669;
+  --success-bg: #ECFDF5;
+  /* Bordas mais afiadas, estilo Manus */
+  --radius: 6px;
+  --radius-lg: 8px;
+  /* Sombras secas e diretas, zero glassmorphism */
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --surface: #0A0A0A;
+  --surface2: #9d9d9d;
+  --border: #262626;
+  --border2: #404040;
+  --text: #6d7e9f;
+  --text2: #D4D4D8;
+  --text3: #A1A1AA;
+  --accent: #FFFFFF;
+  --accent-fg: #000000;
+  --accent-light: #262626;
+  --block-header: #FAFAFA;
+  --block-header-fg: #0A0A0A;
+  --danger: #EF4444;
+  --danger-bg: #450A0A;
+  --warn: #F59E0B;
+  --warn-bg: #451A03;
+  --success: #10B981;
+  --success-bg: #064E3B;
+  --shadow-soft: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-hover: 0 4px 6px -1px rgba(0,0,0,0.5);
+}
+
+/* Transições globais fluidas */
+body, header, .card, .card-header, .tec-block, .os-block, .os-header,
+input, select, textarea, .btn, .glass-footer, .verif-mark, .nav-bar,
+.metric-card, .metric-value, .metric-label, .tec-header {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ==========================================================================
+   BASE & TIPOGRAFIA
+   ========================================================================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   UTILITÁRIOS
+   ========================================================================== */
+
+.hidden { display: none !important; }
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.sub-item { margin-bottom: 12px; }
+
+.mb-4 { margin-bottom: 24px; }
+.mt-4 { margin-top: 24px; }
+.mt-3 { margin-top: 12px; }
+.mt-1 { margin-top: 4px; }
+.m-4  { margin: 24px; }
+.m-0  { margin: 0; }
+.p-0  { padding: 0; }
+
+.flex-row     { display: flex; flex-direction: row; gap: 12px; }
+.flex-1       { flex: 1; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+
+.text-muted { color: var(--text3); }
+.text-xs    { font-size: 12px; }
+.text-lg    { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.pb-space   { margin-bottom: 120px; }
+.shadow-sm  { box-shadow: var(--shadow-soft); }
+.shadow-lg  { box-shadow: var(--shadow-hover); }
+
+/* ==========================================================================
+   LAYOUT DE NAVEGAÇÃO — INTEGRADO E SÓLIDO (MANUS.IM)
+   ========================================================================== */
+
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 48px; /* Espaçamento cirúrgico entre logo e início das abas */
+  height: 100%;
+}
+
+.logo { 
+  font-weight: 700; 
+  font-size: 15px; 
+  letter-spacing: -0.02em; 
+  white-space: nowrap;
+}
+.logo span { color: var(--text3); font-weight: 500; }
+
+.tabs {
+  display: flex;
+  height: 100%;
+  gap: 28px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  height: 100%;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text3);
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 2px;
+  background: var(--text);
+  transform: scaleX(0);
+  transition: transform 0.15s ease;
+  transform-origin: left;
+}
+
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--text); font-weight: 700; }
+.tab-btn.active::after { transform: scaleX(1); }
+
+.tab-content { display: none; }
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.main { 
+  max-width: 900px; 
+  margin: 0 auto; 
+  /* 40px topo, 20px laterais, e 100px de fundo para nunca colidir com o footer */
+  padding: 40px 20px 100px 20px; 
+}
+
+/* ==========================================================================
+   CARDS
+   ========================================================================== */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.card-accent { border: 1px solid var(--text); }
+
+.card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-body { padding: 24px; }
+
+/* ==========================================================================
+   BLOCOS (TÉCNICOS E OS)
+   ========================================================================== */
+
+.tec-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.tec-header {
+  padding: 16px 24px;
+  background: var(--block-header);
+  color: var(--block-header-fg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tec-header-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+.tec-header-actions { display: flex; gap: 10px; }
+.tec-name  { font-size: 14px; font-weight: 600; }
+.tec-body  { padding: 24px; background: var(--surface); }
+
+.tec-block.collapsed .tec-body { display: none; }
+.tec-block.collapsed .tec-header { border-radius: var(--radius-lg); }
+.tec-chevron { display: inline-flex; transition: transform 0.2s ease; }
+.tec-block.collapsed .tec-chevron { transform: rotate(-90deg); }
+
+/* Botões sólidos do cabeçalho */
+.btn-ghost-header {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--surface);
+  background: transparent;
+  border: 1px solid var(--border2);
+  transition: background 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+:root[data-theme="light"] .btn-ghost-header {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+}
+
+:root[data-theme="light"] .btn-ghost-header:hover { background: rgba(255, 255, 255, 0.1); }
+:root[data-theme="light"] .btn-ghost-header.danger { border-color: var(--danger); color: #FFF; background: var(--danger); }
+
+:root[data-theme="dark"] .btn-ghost-header {
+  border-color: var(--border);
+  color: var(--text);
+}
+:root[data-theme="dark"] .btn-ghost-header:hover { background: var(--surface2); }
+:root[data-theme="dark"] .btn-ghost-header.danger { border-color: var(--danger); color: var(--danger); }
+
+/* OS Block */
+.os-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+.os-header {
+  padding: 12px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.os-num-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.os-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+/* ==========================================================================
+   FORMULÁRIOS
+   ========================================================================== */
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field label, label.lbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  line-height: 1;
+}
+
+input[type=text], select, textarea {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type=text]:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--text);
+  box-shadow: 0 0 0 1px var(--text);
+}
+
+textarea { resize: vertical; min-height: 80px; }
+select { cursor: pointer; }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.equip-row { display: grid; grid-template-columns: 2fr 1.5fr 120px auto; gap: 12px; align-items: end; }
+.erro-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
+
+/* ==========================================================================
+   BOTÕES
+   ========================================================================== */
+
+.btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+
+.pill-btn { border-radius: 999px; }
+.btn-secundario { border-radius: 999px; }
+
+.btn:hover { background: var(--surface2); border-color: var(--border2); }
+
+.btn.primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: 1px solid var(--accent);
+}
+
+.btn.primary:hover {
+  background: var(--text2);
+  border-color: var(--text2);
+}
+
+.btn.danger { color: var(--danger); background: var(--surface); border-color: var(--border); }
+.btn.danger:hover { background: var(--danger-bg); border-color: var(--danger); }
+
+.btn.sm { font-size: 12px; padding: 6px 12px; }
+.btn.xs { font-size: 11px; padding: 4px 8px; box-shadow: none; }
+
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-icon {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  width: 36px; height: 36px;
+}
+.btn-icon:hover { background: var(--surface2); color: var(--text); }
+
+/* ==========================================================================
+   VERIFICAÇÃO
+   ========================================================================== */
+
+.verif-mark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.verif-mark:hover { border-color: var(--border2); background: var(--surface2); }
+.verif-mark input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--text); }
+.verif-mark label { font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+
+.verif-reason { margin-top: 12px; display: none; }
+.verif-reason.show { display: block; animation: fadeIn 0.2s ease; }
+
+/* ==========================================================================
+   SECTION LABELS, BADGES, TAGS
+   ========================================================================== */
+
+.sec-label {
+  font-size: 12px; 
+  font-weight: 700; 
+  color: var(--text);
+  margin: 16px 0 8px; 
+  display: flex; 
+  align-items: center; 
+  gap: 12px;
+}
+.sec-label::after { 
+  content: ''; 
+  flex: 1; 
+  height: 1px; 
+  background: var(--border); 
+}
+
+.add-row { 
+  display: flex; 
+  gap: 10px; 
+  flex-wrap: wrap; 
+  margin-top: 8px; 
+}
+
+.badge {
+  font-size: 11px; 
+  font-weight: 600;
+  padding: 2px 8px; 
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: inline-flex; 
+  align-items: center;
+}
+
+.badge.warn { 
+  background: var(--warn-bg); 
+  color: var(--warn); 
+  border-color: var(--warn); 
+}
+.badge.num { 
+  background: var(--surface); 
+  color: var(--text); 
+}
+.badge.ok { 
+  background: var(--success-bg); 
+  color: var(--success); 
+  border-color: var(--success); 
+}
+
+.tag {
+  font-size: 12px; 
+  padding: 4px 10px; 
+  border-radius: var(--radius);
+  font-weight: 500; 
+  background: var(--surface); 
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+
+/* ==========================================================================
+   FOOTER CONTROLS
+   ========================================================================== */
+
+/* Mantido o nome "glass-footer", mas com comportamento de bloco sólido */
+.glass-footer {
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex; 
+  gap: 16px; 
+  justify-content: flex-end; 
+  align-items: center;
+  z-index: 100;
+}
+.glass-footer .info { flex: 1; font-size: 13px; font-weight: 500; color: var(--text3); }
+
+/* ==========================================================================
+   TOAST
+   ========================================================================== */
+
+#toast {
+  position: fixed; bottom: 80px; right: 32px;
+  background: var(--text); color: var(--surface);
+  padding: 12px 20px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 600;
+  box-shadow: var(--shadow-hover);
+  transform: translateY(10px); opacity: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none; z-index: 999;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
+
+.empty {
+  text-align: center; padding: 40px 20px; color: var(--text3);
+  font-size: 13px; font-weight: 500;
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+/* ==========================================================================
+   BASE DE DADOS (CONFIG)
+   ========================================================================== */
+
+.config-list-container {
+  margin-top: 16px; display: flex; flex-direction: column; gap: 8px;
+  max-height: 280px; overflow-y: auto; padding-right: 4px;
+}
+.config-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; background: var(--surface); 
+  border: 1px solid var(--border); border-radius: var(--radius); 
+  font-size: 13px; font-weight: 500;
+}
+
+/* ==========================================================================
+   EXPORTAÇÃO
+   ========================================================================== */
+
+.export-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.export-row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ==========================================================================
+   ANALYTICS — MÉTRICAS & GRÁFICOS
+   ========================================================================== */
+
+.metrics-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px; margin-bottom: 24px;
+}
+.metric-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px;
+  text-align: left; box-shadow: var(--shadow-soft);
+}
+
+.metric-card.warn { border-color: var(--warn); background-color: var(--surface); }
+.metric-card.warn .metric-value, .metric-card.warn .metric-label { color: var(--warn); }
+
+.metric-card.highlight { border-color: var(--text); background-color: var(--surface); }
+.metric-card.highlight .metric-value, .metric-card.highlight .metric-label { color: var(--text); }
+
+.metric-value { font-size: 32px; font-weight: 700; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; }
+.metric-label { font-size: 12px; font-weight: 600; color: var(--text3); margin-top: 8px; }
+
+/* Barras horizontais */
+.chart-bar-row { display: grid; grid-template-columns: 140px 1fr 60px auto; align-items: center; gap: 16px; margin-bottom: 12px; }
+.chart-label { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chart-bar-track { background: var(--surface2); border-radius: 999px; height: 8px; overflow: hidden; }
+.chart-bar-fill { height: 100%; border-radius: 999px; background: var(--text); transition: width 0.8s ease; }
+.chart-bar-fill.warn { background: var(--warn); }
+.chart-bar-fill.success { background: var(--success); }
+.chart-val { font-size: 13px; font-weight: 600; color: var(--text2); text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Tabela de histórico */
+.hist-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.hist-table th { text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text2); border-bottom: 1px solid var(--border); background: var(--surface2); }
+.hist-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text); font-weight: 400; vertical-align: middle; }
+.hist-table tbody tr:last-child td { border-bottom: none; }
+.hist-table tbody tr:hover td { background: var(--surface2); }
+
+/* ==========================================================================
+   TABELA DE TÉCNICOS — OS POR TÉCNICO
+   ========================================================================== */
+
+.tecnicos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tecnicos-table thead {
+  background: var(--surface2);
+}
+
+.tecnicos-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tecnicos-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.tecnicos-table th.sortable:hover {
+  color: var(--text);
+}
+
+.tecnicos-table .sort-icon {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.tecnicos-table th.sortable:hover .sort-icon {
+  color: var(--text);
+}
+
+.tecnicos-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+.tecnicos-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tecnicos-table tbody tr:hover td {
+  background: var(--surface2);
+}
+
+.tecnicos-table .tec-nome {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.tecnicos-table .tec-os {
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.tecnicos-table .tec-verif {
+  font-variant-numeric: tabular-nums;
+}
+
+.tecnicos-table .zero-val {
+  color: var(--text3);
+}
+
+/* Responsivo para a tabela de técnicos */
+@media (max-width: 640px) {
+  .tecnicos-table th,
+  .tecnicos-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
+
+/* ==========================================================================
+   PAINEL DUAL DE TÉCNICOS — Todo o período + Mês atual
+   ========================================================================== */
+
+.tecnicos-dual-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.tecnicos-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  background: var(--surface2);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.panel-subtitle {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.panel-content {
+  flex: 1;
+  overflow: auto;
+  max-height: 400px;
+}
+
+/* Tabela compacta para os painéis */
+.tecnicos-table.compact {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.tecnicos-table.compact th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  background: var(--surface);
+}
+
+.tecnicos-table.compact th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.tecnicos-table.compact th.sortable:hover {
+  color: var(--text);
+}
+
+.tecnicos-table.compact .sort-icon {
+  margin-left: 4px;
+  font-size: 10px;
+  color: var(--text3);
+}
+
+.tecnicos-table.compact td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.tecnicos-table.compact tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tecnicos-table.compact tbody tr:hover td {
+  background: var(--surface2);
+}
+
+.tecnicos-table.compact .tec-nome {
+  font-weight: 500;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tecnicos-table.compact .tec-os {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.tecnicos-table.compact .tec-verif {
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.tecnicos-table.compact .zero-val {
+  color: var(--text3);
+}
+
+/* Responsivo: em telas pequenas, empilha os painéis */
+@media (max-width: 768px) {
+  .tecnicos-dual-panel {
+    grid-template-columns: 1fr;
+  }
+  
+  .panel-content {
+    max-height: 300px;
+  }
+}
+
+/* ==========================================================================
+   PAINEL DE TÉCNICOS COM TOGGLE
+   ========================================================================== */
+
+.tecnicos-panel-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tecnicos-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+.tecnicos-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.tecnicos-toggle-group {
+  display: flex;
+  gap: 8px;
+  position: relative;
+}
+
+.tecnicos-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tecnicos-toggle:hover {
+  background: var(--surface3);
+  color: var(--text);
+}
+
+.tecnicos-toggle.active {
+  background: var(--text);
+  color: var(--surface);
+  border-color: var(--text);
+}
+
+.tecnicos-toggle.with-dropdown {
+  padding-right: 12px;
+}
+
+.toggle-arrow {
+  transition: transform 0.2s ease;
+}
+
+.toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown de meses */
+.mes-dropdown-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  z-index: 100;
+  display: none;
+  overflow: hidden;
+}
+
+.mes-dropdown-options.show {
+  display: block;
+}
+
+.mes-option {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid var(--border);
+}
+
+.mes-option:last-child {
+  border-bottom: none;
+}
+
+.mes-option:hover {
+  background: var(--surface2);
+}
+
+.mes-option.active {
+  background: var(--accent);
+  color: var(--surface);
+}
+
+/* Conteúdo da tabela */
+.tecnicos-panel-content {
+  padding: 0;
+  min-height: 200px;
+}
+
+.tecnicos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tecnicos-table thead {
+  background: var(--surface);
+}
+
+.tecnicos-table th {
+  text-align: left;
+  padding: 14px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tecnicos-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.tecnicos-table th.sortable:hover {
+  color: var(--text);
+}
+
+.tecnicos-table .sort-icon {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.tecnicos-table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.tecnicos-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tecnicos-table tbody tr:hover td {
+  background: var(--surface2);
+}
+
+.tecnicos-table .tec-nome {
+  font-weight: 500;
+}
+
+.tecnicos-table .tec-os {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tecnicos-table .tec-verif {
+  font-variant-numeric: tabular-nums;
+}
+
+.tecnicos-table .zero-val {
+  color: var(--text3);
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .tecnicos-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .tecnicos-toggle-group {
+    width: 100%;
+  }
+  
+  .tecnicos-toggle {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ==========================================================================
+   SCROLLBAR
+   ========================================================================== */
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .glass-header { padding: 0 16px; height: 56px; }
+  .main { padding: 24px 12px; }
+  .row2, .row3 { grid-template-columns: 1fr; gap: 12px; }
+  .equip-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .equip-row > *:last-child { grid-column: span 2; justify-self: start; }
+  .metrics-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .metric-value { font-size: 28px; }
+  .glass-footer { padding: 10px 16px; }
+  .glass-footer .info { display: none; }
+  .chart-bar-row { grid-template-columns: 90px 1fr 44px; }
+  .chart-bar-row > *:last-child { display: none; }
+  .tabs { gap: 16px; }
+  .tab-btn { font-size: 12px; padding: 12px 0; }
+}
+@media (max-width: 640px) {
+  .site-header { 
+    padding: 12px 16px; /* Define 12px acima/abaixo e 16px nas laterais */
+    height: auto; 
+    flex-direction: column; 
+    gap: 12px; 
+    align-items: flex-start; 
+  }
+  .header-left { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 12px; 
+    width: 100%; 
+  }
+  .tabs { 
+    width: 100%; 
+    justify-content: space-between; 
+    gap: 8px; 
+  }
+  .tab-btn { 
+    padding: 8px 0; 
+  }
+  #btn-theme { 
+    position: absolute; 
+    top: 10px; 
+    right: 16px; 
+  }
+}
