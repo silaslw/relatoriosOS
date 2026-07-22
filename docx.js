@@ -38,6 +38,11 @@ async function gerarDocumentos() {
       salvarNoHistorico(dados);
     }
 
+    // LIMPA O RASCUNHO após gerar com sucesso
+    if (typeof limparRascunho === 'function') {
+      limparRascunho();
+    }
+
   } catch (e) {
     toast('Erro ao gerar: ' + e.message, 4000);
     console.error(e);

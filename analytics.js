@@ -2,24 +2,31 @@
 // ANALYTICS — Métricas · Gráficos · Exportação
 // ==========================================================================
 
+// ======================== ESTADO ========================
+
+let tecnicosSortState = { column: 'os', direction: 'desc' };
+let filtroAtual = 'geral'; // 'geral' ou 'mes'
+let mesSelecionado = null; // { mes: 7, ano: 2026, nome: 'Julho' }
+
 // ======================== COMPUTAÇÃO ========================
 
 function computarMetricas(historico) {
   const m = {
-    totalOS:           0,
+    totalOS: 0,
     totalVerificacoes: 0,
-    porTecnico:        {},   // { nome: { total, verificacoes } }
-    errosFreq:         {},   // { erro: count }
-    equipFreq:         {}    // { modelo: count }
+    porTecnico: {},
+    errosFreq: {},
+    equipFreq: {}
   };
 
   historico.forEach(geracao => {
-    geracao.tecnicos.forEach(tec => {
+    (geracao.tecnicos || []).forEach(tec => {
+      if (!tec.nome) return;
       if (!m.porTecnico[tec.nome]) {
         m.porTecnico[tec.nome] = { total: 0, verificacoes: 0 };
       }
 
-      tec.osList.forEach(os => {
+      (tec.osList || []).forEach(os => {
         m.totalOS++;
         m.porTecnico[tec.nome].total++;
 
@@ -41,64 +48,333 @@ function computarMetricas(historico) {
   return m;
 }
 
+function computarMetricasPorMes(historico, mes, ano) {
+  const m = {
+    totalOS: 0,
+    totalVerificacoes: 0,
+    porTecnico: {},
+    errosFreq: {},
+    equipFreq: {}
+  };
+
+  historico.forEach(geracao => {
+    const dataRef = geracao.dataRef || '';
+    const partes = dataRef.split('.');
+    
+    let mesGeracao = null;
+    let anoGeracao = null;
+    
+    if (partes.length >= 2) {
+      mesGeracao = parseInt(partes[1], 10);
+      const anoStr = partes[2] || '';
+      if (anoStr.length === 2) {
+        anoGeracao = 2000 + parseInt(anoStr, 10);
+      } else if (anoStr.length === 4) {
+        anoGeracao = parseInt(anoStr, 10);
+      } else {
+        anoGeracao = new Date().getFullYear();
+      }
+    } else if (geracao.geradoEm) {
+      const dataGeracao = new Date(geracao.geradoEm);
+      mesGeracao = dataGeracao.getMonth() + 1;
+      anoGeracao = dataGeracao.getFullYear();
+    }
+
+    if (mesGeracao !== mes || anoGeracao !== ano) return;
+
+    (geracao.tecnicos || []).forEach(tec => {
+      if (!tec.nome) return;
+      if (!m.porTecnico[tec.nome]) {
+        m.porTecnico[tec.nome] = { total: 0, verificacoes: 0 };
+      }
+
+      (tec.osList || []).forEach(os => {
+        m.totalOS++;
+        m.porTecnico[tec.nome].total++;
+
+        if (os.paraVerif) {
+          m.totalVerificacoes++;
+          m.porTecnico[tec.nome].verificacoes++;
+          (os.erros || []).forEach(err => {
+            if (err) m.errosFreq[err] = (m.errosFreq[err] || 0) + 1;
+          });
+        }
+
+        (os.equips || []).forEach(eq => {
+          if (eq.modelo) m.equipFreq[eq.modelo] = (m.equipFreq[eq.modelo] || 0) + 1;
+        });
+      });
+    });
+  });
+
+  return m;
+}
+
+// Extrai todos os meses únicos do histórico
+function extrairMesesDisponiveis(historico) {
+  const meses = new Map();
+  const nomesMeses = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
+
+  historico.forEach(geracao => {
+    const dataRef = geracao.dataRef || '';
+    const partes = dataRef.split('.');
+    
+    let mes = null;
+    let ano = null;
+    
+    if (partes.length >= 2) {
+      mes = parseInt(partes[1], 10);
+      const anoStr = partes[2] || '';
+      if (anoStr.length === 2) {
+        ano = 2000 + parseInt(anoStr, 10);
+      } else if (anoStr.length === 4) {
+        ano = parseInt(anoStr, 10);
+      } else {
+        ano = new Date().getFullYear();
+      }
+    } else if (geracao.geradoEm) {
+      const data = new Date(geracao.geradoEm);
+      mes = data.getMonth() + 1;
+      ano = data.getFullYear();
+    }
+
+    if (mes && ano) {
+      const key = `${ano}-${mes}`;
+      if (!meses.has(key)) {
+        meses.set(key, {
+          mes: mes,
+          ano: ano,
+          nome: nomesMeses[mes - 1],
+          label: `${nomesMeses[mes - 1]} ${ano}`
+        });
+      }
+    }
+  });
+
+  // Ordena do mais recente para o mais antigo
+  return Array.from(meses.values()).sort((a, b) => {
+    if (a.ano !== b.ano) return b.ano - a.ano;
+    return b.mes - a.mes;
+  });
+}
+
 // ======================== RENDERIZAÇÃO ========================
 
-function renderAnalytics() {
-  const historico = carregarHistorico();
+async function renderAnalytics() {
+  const historico = await carregarHistorico();
 
   if (!historico.length) {
     _setMetricCards('—', '—', '—', '—');
-    _setEmpty('chart-tecnicos',  'Gere relatórios para ver dados aqui.');
-    _setEmpty('chart-erros',     'Nenhuma verificação registrada.');
-    _setEmpty('chart-equips',    'Nenhum equipamento registrado.');
+    _setEmpty('chart-tecnicos', 'Nenhum dado disponível. Gere relatórios para ver métricas.');
+    _setEmpty('chart-erros', 'Nenhuma verificação registrada.');
+    _setEmpty('chart-equips', 'Nenhum equipamento registrado.');
     _setEmpty('historico-table', 'Nenhum relatório gerado ainda.');
     const mg = sel('m-total-geracoes');
     if (mg) mg.textContent = '0 gerações';
     return;
   }
 
-  const m = computarMetricas(historico);
+  // Dados gerais
+  const mGeral = computarMetricas(historico);
+  
+  // Meses disponíveis
+  const mesesDisponiveis = extrairMesesDisponiveis(historico);
+  
+  // Se não tem mês selecionado, seleciona o mais recente
+  if (!mesSelecionado && mesesDisponiveis.length > 0) {
+    mesSelecionado = mesesDisponiveis[0];
+  }
 
-  // Cartões de resumo
-  const pct = m.totalOS > 0
-    ? Math.round(m.totalVerificacoes / m.totalOS * 100) + '%'
+  // Dados do mês selecionado
+  let mMes = { porTecnico: {} };
+  if (mesSelecionado) {
+    mMes = computarMetricasPorMes(historico, mesSelecionado.mes, mesSelecionado.ano);
+  }
+
+  // Cartões de resumo (sempre mostram dados gerais)
+  const pct = mGeral.totalOS > 0
+    ? Math.round(mGeral.totalVerificacoes / mGeral.totalOS * 100) + '%'
     : '0%';
-  _setMetricCards(m.totalOS, Object.keys(m.porTecnico).length, m.totalVerificacoes, pct);
+  _setMetricCards(mGeral.totalOS, Object.keys(mGeral.porTecnico).length, mGeral.totalVerificacoes, pct);
 
   const mg = sel('m-total-geracoes');
   if (mg) mg.textContent = historico.length + ' geração(ões)';
 
-  // Gráficos
-  _renderBarChart('chart-tecnicos', m.porTecnico, (nome, d) => ({
-    label:   nome,
-    value:   d.total,
-    display: d.total + ' OS',
-    suffix:  d.verificacoes > 0
-      ? `<span class="badge warn" style="font-size:9px">${d.verificacoes} verif.</span>`
-      : ''
-  }), 'accent');
+  // Renderiza o painel de técnicos com toggle
+  _renderTecnicosPanel('chart-tecnicos', mGeral.porTecnico, mMes.porTecnico, mesesDisponiveis);
 
-  _renderBarChart('chart-erros', m.errosFreq, (nome, count) => ({
-    label:   nome,
-    value:   count,
+  // Outros gráficos (sempre usam dados gerais)
+  _renderBarChart('chart-erros', mGeral.errosFreq, (nome, count) => ({
+    label: nome,
+    value: count,
     display: count + 'x',
-    suffix:  ''
+    suffix: ''
   }), 'warn', 10);
 
-  _renderBarChart('chart-equips', m.equipFreq, (nome, count) => ({
-    label:   nome,
-    value:   count,
+  _renderBarChart('chart-equips', mGeral.equipFreq, (nome, count) => ({
+    label: nome,
+    value: count,
     display: count + ' inst.',
-    suffix:  ''
+    suffix: ''
   }), 'success', 10);
 
   _renderHistoricoTable(historico);
 }
 
-// ---------- Helpers de renderização ----------
+// NOVO: Renderiza painel de técnicos com toggle
+function _renderTecnicosPanel(containerId, dadosGeral, dadosMes, mesesDisponiveis) {
+  const el = sel(containerId);
+  if (!el) return;
+
+  const dadosAtuais = filtroAtual === 'geral' ? dadosGeral : dadosMes;
+  const temDados = Object.keys(dadosAtuais).length > 0;
+
+  // Botão do mês ativo ou não
+  const mesAtivo = filtroAtual === 'mes';
+  const mesLabel = mesSelecionado ? mesSelecionado.nome.toUpperCase() : 'MÊS';
+
+  // Gera opções do dropdown
+  const dropdownHtml = mesesDisponiveis.length > 0 ? `
+    <div class="mes-dropdown-options" id="mes-dropdown">
+      ${mesesDisponiveis.map(m => `
+        <div class="mes-option ${mesSelecionado && mesSelecionado.mes === m.mes && mesSelecionado.ano === m.ano ? 'active' : ''}" 
+             onclick="selecionarMes(${m.mes}, ${m.ano}, '${m.nome}')">
+          ${m.nome} ${m.ano}
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  el.innerHTML = `
+    <div class="tecnicos-panel-container">
+      <div class="tecnicos-panel-header">
+        <div class="tecnicos-toggle-group">
+          <button class="tecnicos-toggle ${filtroAtual === 'geral' ? 'active' : ''}" 
+                  onclick="setFiltroTecnicos('geral')">
+            TODO O PERÍODO
+          </button>
+          <button class="tecnicos-toggle ${mesAtivo ? 'active' : ''} with-dropdown" 
+                  onclick="toggleMesDropdown()">
+            ${mesLabel}
+            <svg class="toggle-arrow ${mesAtivo ? 'open' : ''}" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          ${dropdownHtml}
+        </div>
+      </div>
+      <div class="tecnicos-panel-content">
+        ${temDados ? _renderTecnicosTableHtml(dadosAtuais) : 
+          '<div class="empty" style="padding:40px">Nenhum dado para o período selecionado.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+// Gera HTML da tabela de técnicos
+function _renderTecnicosTableHtml(data) {
+  const entries = Object.entries(data).map(([nome, d]) => ({
+    nome: nome,
+    os: d.total,
+    verificacoes: d.verificacoes
+  }));
+
+  // Ordena
+  entries.sort((a, b) => {
+    const col = tecnicosSortState.column;
+    const dir = tecnicosSortState.direction === 'asc' ? 1 : -1;
+    if (a[col] < b[col]) return -1 * dir;
+    if (a[col] > b[col]) return 1 * dir;
+    return 0;
+  });
+
+  const getSortIcon = (col) => {
+    if (tecnicosSortState.column !== col) return '⇅';
+    return tecnicosSortState.direction === 'asc' ? '↑' : '↓';
+  };
+
+  return `
+    <table class="tecnicos-table">
+      <thead>
+        <tr>
+          <th class="sortable" onclick="_sortTecnicosTable('nome')">
+            Técnico <span class="sort-icon">${getSortIcon('nome')}</span>
+          </th>
+          <th class="sortable" onclick="_sortTecnicosTable('os')">
+            O.S. <span class="sort-icon">${getSortIcon('os')}</span>
+          </th>
+          <th class="sortable" onclick="_sortTecnicosTable('verificacoes')">
+            Verificações <span class="sort-icon">${getSortIcon('verificacoes')}</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        ${entries.map(item => `
+          <tr>
+            <td class="tec-nome">${item.nome}</td>
+            <td class="tec-os">${item.os}</td>
+            <td class="tec-verif">
+              ${item.verificacoes > 0 
+                ? `<span class="badge warn">${item.verificacoes}</span>` 
+                : '<span class="zero-val">—</span>'}
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ======================== CONTROLES ========================
+
+// Define o filtro ativo (geral ou mes)
+window.setFiltroTecnicos = function(filtro) {
+  filtroAtual = filtro;
+  renderAnalytics();
+};
+
+// Seleciona um mês específico
+window.selecionarMes = function(mes, ano, nome) {
+  mesSelecionado = { mes, ano, nome };
+  filtroAtual = 'mes';
+  renderAnalytics();
+};
+
+// Toggle do dropdown de meses
+window.toggleMesDropdown = function() {
+  const dropdown = sel('mes-dropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('show');
+  }
+};
+
+// Fecha dropdown ao clicar fora
+document.addEventListener('click', (e) => {
+  const dropdown = sel('mes-dropdown');
+  const toggle = e.target.closest('.tecnicos-toggle.with-dropdown');
+  if (dropdown && !toggle && !e.target.closest('.mes-dropdown-options')) {
+    dropdown.classList.remove('show');
+  }
+});
+
+// Ordenação da tabela
+window._sortTecnicosTable = function(column) {
+  if (tecnicosSortState.column === column) {
+    tecnicosSortState.direction = tecnicosSortState.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    tecnicosSortState.column = column;
+    tecnicosSortState.direction = 'desc';
+  }
+  renderAnalytics();
+};
+
+// ---------- Outros helpers (mantidos) ----------
 
 function _setMetricCards(os, tec, verif, pct) {
-  const ids  = ['m-total-os', 'm-total-tec', 'm-total-verif', 'm-pct-verif'];
+  const ids = ['m-total-os', 'm-total-tec', 'm-total-verif', 'm-pct-verif'];
   const vals = [os, tec, verif, pct];
   ids.forEach((id, i) => { const el = sel(id); if (el) el.textContent = vals[i]; });
 }
@@ -108,14 +384,6 @@ function _setEmpty(id, msg) {
   if (el) el.innerHTML = `<div class="empty">${msg}</div>`;
 }
 
-/**
- * Renderiza um gráfico de barras horizontais genérico.
- * @param {string}   containerId  ID do elemento container
- * @param {object}   data         Objeto { chave: valor | objeto }
- * @param {function} mapper       (chave, valor) => { label, value, display, suffix }
- * @param {string}   colorClass   'accent' | 'warn' | 'success'
- * @param {number}   limit        Máximo de itens a exibir
- */
 function _renderBarChart(containerId, data, mapper, colorClass = 'accent', limit = 20) {
   const el = sel(containerId);
   if (!el) return;
@@ -131,7 +399,6 @@ function _renderBarChart(containerId, data, mapper, colorClass = 'accent', limit
   }
 
   const max = entries[0].value || 1;
-  // colorClass 'accent' usa a classe padrão sem modificador; warn e success adicionam a sua própria
   const fillClass = colorClass === 'accent' ? '' : colorClass;
 
   el.innerHTML = entries.map(item => {
@@ -153,12 +420,12 @@ function _renderHistoricoTable(historico) {
   if (!el) return;
 
   const rows = [...historico].reverse().map(g => {
-    const totalOS    = g.tecnicos.reduce((a, t) => a + t.osList.length, 0);
-    const totalVerif = g.tecnicos.reduce(
-      (a, t) => a + t.osList.filter(o => o.paraVerif).length, 0
+    const totalOS = (g.tecnicos || []).reduce((a, t) => a + (t.osList || []).length, 0);
+    const totalVerif = (g.tecnicos || []).reduce(
+      (a, t) => a + (t.osList || []).filter(o => o.paraVerif).length, 0
     );
-    const nomes = g.tecnicos.map(t => t.nome).join(', ');
-    const dt    = new Date(g.geradoEm).toLocaleString('pt-BR');
+    const nomes = (g.tecnicos || []).map(t => t.nome).join(', ');
+    const dt = new Date(g.geradoEm).toLocaleString('pt-BR');
     return `
       <tr>
         <td><strong>${g.dataRef}</strong></td>
@@ -188,42 +455,9 @@ function _renderHistoricoTable(historico) {
     </table>`;
 }
 
-// ======================== EXPORTAÇÃO ========================
-
-/**
- * Constrói as linhas brutas do histórico — compartilhado por CSV e XLSX.
- * Extrai a lógica duplicada que existia em exportarCSV() e exportarXLSX().
- */
-function _buildExportRows(historico) {
-  const header = [
-    'Data Ref', 'Gerado Em', 'Técnico', 'Nº OS', 'Tipo',
-    'Para Verificação', 'Erros', 'Equipamentos', 'Observação'
-  ];
-  const rows = [header];
-
-  historico.forEach(g => {
-    g.tecnicos.forEach(tec => {
-      tec.osList.forEach(os => {
-        rows.push([
-          g.dataRef,
-          new Date(g.geradoEm).toLocaleString('pt-BR'),
-          tec.nome,
-          os.numOS,
-          os.tipo || '',
-          os.paraVerif ? 'SIM' : 'NÃO',
-          (os.erros  || []).join('; '),
-          (os.equips || []).map(e => `${e.modelo}(${e.serial})`).join('; '),
-          os.obs || ''
-        ]);
-      });
-    });
-  });
-
-  return rows;
-}
-
-function exportarCSV() {
-  const historico = carregarHistorico();
+// Exportações (mantidas)
+async function exportarCSV() {
+  const historico = await carregarHistorico();
   if (!historico.length) return toast('Nenhum dado para exportar.', 3000);
 
   const linhas = _buildExportRows(historico);
@@ -235,8 +469,8 @@ function exportarCSV() {
   toast('✓ CSV exportado!');
 }
 
-function exportarXML() {
-  const historico = carregarHistorico();
+async function exportarXML() {
+  const historico = await carregarHistorico();
   if (!historico.length) return toast('Nenhum dado para exportar.', 3000);
 
   const esc = s => String(s)
@@ -247,12 +481,12 @@ function exportarXML() {
 
   historico.forEach(g => {
     xml += `  <geracao id="${g.id}" dataRef="${esc(g.dataRef)}" geradoEm="${esc(g.geradoEm)}">\n`;
-    g.tecnicos.forEach(tec => {
+    (g.tecnicos || []).forEach(tec => {
       xml += `    <tecnico nome="${esc(tec.nome)}">\n`;
-      tec.osList.forEach(os => {
+      (tec.osList || []).forEach(os => {
         xml += `      <os num="${esc(os.numOS)}" tipo="${esc(os.tipo || '')}" verificacao="${os.paraVerif}">\n`;
-        (os.erros  || []).forEach(err => { xml += `        <erro>${esc(err)}</erro>\n`; });
-        (os.equips || []).forEach(eq  => {
+        (os.erros || []).forEach(err => { xml += `        <erro>${esc(err)}</erro>\n`; });
+        (os.equips || []).forEach(eq => {
           xml += `        <equipamento modelo="${esc(eq.modelo)}" serial="${esc(eq.serial)}" status="${esc(eq.status || '')}"/>\n`;
         });
         if (os.obs) xml += `        <obs>${esc(os.obs)}</obs>\n`;
@@ -268,16 +502,14 @@ function exportarXML() {
   toast('✓ XML exportado!');
 }
 
-function exportarXLSX() {
-  const historico = carregarHistorico();
+async function exportarXLSX() {
+  const historico = await carregarHistorico();
   if (!historico.length) return toast('Nenhum dado para exportar.', 3000);
 
-  // Aba 1 — usa helper compartilhado (antes era código duplicado de exportarCSV)
   const raw1 = _buildExportRows(historico);
-
-  // Aba 2 — OS por técnico
-  const m    = computarMetricas(historico);
+  const m = computarMetricas(historico);
   const raw2 = [['Técnico', 'Total OS', 'Verificações', 'Taxa (%)']];
+
   Object.entries(m.porTecnico)
     .sort((a, b) => b[1].total - a[1].total)
     .forEach(([nome, d]) => {
@@ -285,13 +517,11 @@ function exportarXLSX() {
         d.total > 0 ? Math.round(d.verificacoes / d.total * 100) : 0]);
     });
 
-  // Aba 3 — Erros mais frequentes
   const raw3 = [['Erro / Pendência', 'Ocorrências']];
   Object.entries(m.errosFreq)
     .sort((a, b) => b[1] - a[1])
     .forEach(([e, n]) => raw3.push([e, n]));
 
-  // Aba 4 — Equipamentos mais instalados
   const raw4 = [['Equipamento', 'Instalações']];
   Object.entries(m.equipFreq)
     .sort((a, b) => b[1] - a[1])
@@ -306,9 +536,37 @@ function exportarXLSX() {
   toast('✓ XLSX exportado!');
 }
 
-function confirmarLimparHistorico() {
+async function confirmarLimparHistorico() {
   if (!confirm('Todo o histórico de métricas será apagado permanentemente. Continuar?')) return;
-  limparHistorico();
-  renderAnalytics();
+  await limparHistorico();
+  await renderAnalytics();
   toast('Histórico apagado.', 2500);
+}
+
+function _buildExportRows(historico) {
+  const header = [
+    'Data Ref', 'Gerado Em', 'Técnico', 'Nº OS', 'Tipo',
+    'Para Verificação', 'Erros', 'Equipamentos', 'Observação'
+  ];
+  const rows = [header];
+
+  historico.forEach(g => {
+    (g.tecnicos || []).forEach(tec => {
+      (tec.osList || []).forEach(os => {
+        rows.push([
+          g.dataRef,
+          new Date(g.geradoEm).toLocaleString('pt-BR'),
+          tec.nome,
+          os.numOS,
+          os.tipo || '',
+          os.paraVerif ? 'SIM' : 'NÃO',
+          (os.erros || []).join('; '),
+          (os.equips || []).map(e => `${e.modelo}(${e.serial})`).join('; '),
+          os.obs || ''
+        ]);
+      });
+    });
+  });
+
+  return rows;
 }

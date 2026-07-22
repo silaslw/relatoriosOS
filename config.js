@@ -57,6 +57,11 @@ function renderListaConfig(tipo) {
 // ---------- Adicionar / Remover itens ----------
 
 function adicionarItemConfig(tipo) {
+  // SALVA O RASCUNHO ANTES de modificar os dados
+  if (typeof salvarRascunho === 'function') {
+    salvarRascunho();
+  }
+
   const input     = document.getElementById('input-' + tipo);
   const valor     = input.value.trim().toUpperCase();
   const listaAtual = MAPA_DADOS[tipo].lista();
@@ -73,6 +78,12 @@ function adicionarItemConfig(tipo) {
 
 function removerItemConfig(tipo, index) {
   if (!confirm('Tem certeza que deseja remover este item?')) return;
+  
+  // SALVA O RASCUNHO ANTES de modificar os dados
+  if (typeof salvarRascunho === 'function') {
+    salvarRascunho();
+  }
+  
   const listaAtual = MAPA_DADOS[tipo].lista();
   listaAtual.splice(index, 1);
   salvarDados(tipo, listaAtual);
@@ -173,6 +184,20 @@ function processarPlanilha(linhas) {
     4000
   );
 }
+
+// ==========================================================================
+// RESTAURAÇÃO DE RASCUNHO AO CARREGAR
+// ==========================================================================
+
+// Após carregar os dados iniciais, verifica se há rascunho para restaurar
+window.addEventListener('DOMContentLoaded', () => {
+  // Aguarda os dados carregarem do servidor
+  setTimeout(() => {
+    if (typeof restaurarRascunho === 'function') {
+      restaurarRascunho();
+    }
+  }, 500);
+});
 
 // ==========================================================================
 // INICIALIZAÇÃO — aba padrão + atalhos globais

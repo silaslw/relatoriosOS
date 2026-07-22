@@ -3,7 +3,7 @@
    ========================================================================== */
 
 :root, :root[data-theme="light"] {
-  --bg: #FAFAFA;
+  --bg: #eaeaea;
   --surface: #FFFFFF;
   --surface2: #F3F4F6;
   --border: #E5E7EB;
@@ -36,7 +36,7 @@
   --surface2: #9d9d9d;
   --border: #262626;
   --border2: #404040;
-  --text: #111827;
+  --text: #6d7e9f;
   --text2: #D4D4D8;
   --text3: #A1A1AA;
   --accent: #FFFFFF;
@@ -612,6 +612,430 @@ select { cursor: pointer; }
 .hist-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text); font-weight: 400; vertical-align: middle; }
 .hist-table tbody tr:last-child td { border-bottom: none; }
 .hist-table tbody tr:hover td { background: var(--surface2); }
+
+/* ==========================================================================
+   TABELA DE TÉCNICOS — OS POR TÉCNICO
+   ========================================================================== */
+
+.tecnicos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tecnicos-table thead {
+  background: var(--surface2);
+}
+
+.tecnicos-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tecnicos-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.tecnicos-table th.sortable:hover {
+  color: var(--text);
+}
+
+.tecnicos-table .sort-icon {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.tecnicos-table th.sortable:hover .sort-icon {
+  color: var(--text);
+}
+
+.tecnicos-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+.tecnicos-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tecnicos-table tbody tr:hover td {
+  background: var(--surface2);
+}
+
+.tecnicos-table .tec-nome {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.tecnicos-table .tec-os {
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.tecnicos-table .tec-verif {
+  font-variant-numeric: tabular-nums;
+}
+
+.tecnicos-table .zero-val {
+  color: var(--text3);
+}
+
+/* Responsivo para a tabela de técnicos */
+@media (max-width: 640px) {
+  .tecnicos-table th,
+  .tecnicos-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
+
+/* ==========================================================================
+   PAINEL DUAL DE TÉCNICOS — Todo o período + Mês atual
+   ========================================================================== */
+
+.tecnicos-dual-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.tecnicos-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  background: var(--surface2);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.panel-subtitle {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.panel-content {
+  flex: 1;
+  overflow: auto;
+  max-height: 400px;
+}
+
+/* Tabela compacta para os painéis */
+.tecnicos-table.compact {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.tecnicos-table.compact th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  background: var(--surface);
+}
+
+.tecnicos-table.compact th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.tecnicos-table.compact th.sortable:hover {
+  color: var(--text);
+}
+
+.tecnicos-table.compact .sort-icon {
+  margin-left: 4px;
+  font-size: 10px;
+  color: var(--text3);
+}
+
+.tecnicos-table.compact td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.tecnicos-table.compact tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tecnicos-table.compact tbody tr:hover td {
+  background: var(--surface2);
+}
+
+.tecnicos-table.compact .tec-nome {
+  font-weight: 500;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tecnicos-table.compact .tec-os {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.tecnicos-table.compact .tec-verif {
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.tecnicos-table.compact .zero-val {
+  color: var(--text3);
+}
+
+/* Responsivo: em telas pequenas, empilha os painéis */
+@media (max-width: 768px) {
+  .tecnicos-dual-panel {
+    grid-template-columns: 1fr;
+  }
+  
+  .panel-content {
+    max-height: 300px;
+  }
+}
+
+/* ==========================================================================
+   PAINEL DE TÉCNICOS COM TOGGLE
+   ========================================================================== */
+
+.tecnicos-panel-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tecnicos-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+.tecnicos-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.tecnicos-toggle-group {
+  display: flex;
+  gap: 8px;
+  position: relative;
+}
+
+.tecnicos-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tecnicos-toggle:hover {
+  background: var(--surface3);
+  color: var(--text);
+}
+
+.tecnicos-toggle.active {
+  background: var(--text);
+  color: var(--surface);
+  border-color: var(--text);
+}
+
+.tecnicos-toggle.with-dropdown {
+  padding-right: 12px;
+}
+
+.toggle-arrow {
+  transition: transform 0.2s ease;
+}
+
+.toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown de meses */
+.mes-dropdown-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  z-index: 100;
+  display: none;
+  overflow: hidden;
+}
+
+.mes-dropdown-options.show {
+  display: block;
+}
+
+.mes-option {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid var(--border);
+}
+
+.mes-option:last-child {
+  border-bottom: none;
+}
+
+.mes-option:hover {
+  background: var(--surface2);
+}
+
+.mes-option.active {
+  background: var(--accent);
+  color: var(--surface);
+}
+
+/* Conteúdo da tabela */
+.tecnicos-panel-content {
+  padding: 0;
+  min-height: 200px;
+}
+
+.tecnicos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tecnicos-table thead {
+  background: var(--surface);
+}
+
+.tecnicos-table th {
+  text-align: left;
+  padding: 14px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tecnicos-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.tecnicos-table th.sortable:hover {
+  color: var(--text);
+}
+
+.tecnicos-table .sort-icon {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.tecnicos-table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.tecnicos-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tecnicos-table tbody tr:hover td {
+  background: var(--surface2);
+}
+
+.tecnicos-table .tec-nome {
+  font-weight: 500;
+}
+
+.tecnicos-table .tec-os {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tecnicos-table .tec-verif {
+  font-variant-numeric: tabular-nums;
+}
+
+.tecnicos-table .zero-val {
+  color: var(--text3);
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .tecnicos-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .tecnicos-toggle-group {
+    width: 100%;
+  }
+  
+  .tecnicos-toggle {
+    flex: 1;
+    justify-content: center;
+  }
+}
 
 /* ==========================================================================
    SCROLLBAR
